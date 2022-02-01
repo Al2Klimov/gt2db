@@ -71,7 +71,8 @@ def main():
                             break
 
                         cur.execute(
-                            'INSERT INTO searches(keyword, time, searches) VALUES (%s, %s, %s)',
+                            'INSERT INTO searches(keyword, time, searches) VALUES (%s, %s, %s)'
+                            ' ON CONFLICT ON CONSTRAINT searches_pk DO NOTHING',
                             (id, ts.isoformat(), series[keyword])
                         )
 
