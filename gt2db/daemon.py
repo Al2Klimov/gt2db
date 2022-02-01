@@ -18,6 +18,7 @@ def main():
     span = timedelta(days=100)
     gt_res = timedelta(hours=1)
     tr = TrendReq(tz=0, retries=3)
+    rate = 600
 
     conn: connection
     with psycopg2.connect(environ['DB'] if 'DB' in environ else '') as conn:
@@ -55,7 +56,7 @@ def main():
                     timeline: DataFrame = tr.get_historical_interest(
                         [keyword], year_start=new_from.year, month_start=new_from.month, day_start=new_from.day,
                         hour_start=new_from.hour, year_end=new_to.year, month_end=new_to.month, day_end=new_to.day,
-                        hour_end=new_to.hour, sleep=10
+                        hour_end=new_to.hour, sleep=rate
                     )
 
                     logging.info('Updating "%s"', keyword)
@@ -84,7 +85,7 @@ def main():
                 else:
                     logging.debug('Nothing to do (no keywords)')
 
-                sleep(15)
+                sleep(rate)
 
 
 if __name__ == '__main__':
