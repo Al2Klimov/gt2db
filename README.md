@@ -59,6 +59,7 @@ cat <<EOF >/etc/systemd/system/gt2db.service
 After=postgresql.service
 
 [Service]
+Type=notify
 Environment=DB=postgresql://gt:123456@127.0.0.1/gt
 ExecStart=/bin/bash -ec '. /opt/gt2db/venv/bin/activate; exec python3 -m gt2db.daemon'
 User=nobody
