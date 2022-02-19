@@ -19,14 +19,14 @@ def main():
     gt_res = timedelta(hours=1)
     tr = TrendReq(tz=0, retries=3)
     rate = 600
+    conn: connection = psycopg2.connect(environ['DB'] if 'DB' in environ else '')
+    cur: cursor
 
-    conn: connection
-    with psycopg2.connect(environ['DB'] if 'DB' in environ else '') as conn:
-        cur: cursor
-        with conn.cursor() as cur:
-            SystemdNotifier().notify('READY=1')
+    SystemdNotifier().notify('READY=1')
 
-            while True:
+    while True:
+        with conn:
+            with conn.cursor() as cur:
                 cur.execute(
                     'SELECT kw.id, kw.keyword, kw.past_done,'
                     ' (SELECT MIN(sc.time) FROM searches sc WHERE sc.keyword=kw.id) searches_from,'
@@ -81,11 +81,10 @@ def main():
                         cur.execute('UPDATE keyword SET past_done=TRUE WHERE id=%s', (id,))
 
                     cur.execute('UPDATE keyword SET updated=NOW() WHERE id=%s', (id,))
-                    conn.commit()
                 else:
                     logging.debug('Nothing to do (no keywords)')
 
-                sleep(rate)
+        sleep(rate)
 
 
 if __name__ == '__main__':
